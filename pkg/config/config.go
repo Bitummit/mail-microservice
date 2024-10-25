@@ -27,7 +27,7 @@ type Kafka struct {
 
 type Email struct {
 	Server string 	`yaml:"smtp_server" env-default:"smtp.mail.ru"`
-	Port string		`yaml:"smtp_port" env-default:"587"`
+	Port int		`yaml:"smtp_port" env-default:"587"`
 }
 
 

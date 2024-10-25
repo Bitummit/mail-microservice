@@ -29,7 +29,7 @@ type (
 
 
 func New(cfg *config.Config, log *slog.Logger) *Server{
-	service := service.New()
+	service := service.New(cfg)
 	return &Server{
 		Cfg: cfg,
 		Log: log,
