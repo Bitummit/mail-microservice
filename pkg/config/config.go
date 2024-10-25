@@ -48,7 +48,7 @@ func InitConfig() *Config{
 	
 	var cfg Config
 	if err := cleanenv.ReadConfig(configPath, &cfg); err != nil {
-		log.Fatalln("Error in reading config file!")
+		log.Fatalln("Error in reading config file!", err)
 	}
 	
 	return &cfg

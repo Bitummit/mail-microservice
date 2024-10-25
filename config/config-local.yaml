@@ -10,4 +10,4 @@ kafka_broker:
 
 email:
   smtp_server: "smtp.mail.ru"
-  smtp_port: "587"
+  smtp_port: 465
