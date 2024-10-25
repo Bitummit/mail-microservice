@@ -10,8 +10,10 @@ import (
 
 
 type Config struct {
-	Env string `yaml:"env" env-default:"dev"`
-	GrpcServer `yaml:"grpc_server"`
+	Env string	`yaml:"env" env-default:"dev"`
+	GrpcServer	`yaml:"grpc_server"`
+	Kafka 		`yaml:"kafka_broker"`
+	Email		`yaml:"email"`
 
 }
 
@@ -21,6 +23,11 @@ type GrpcServer struct {
 
 type Kafka struct {
 	KafkaAddress string `yaml:"kafka_address" env-default:"0.0.0.0:9092"`
+}
+
+type Email struct {
+	Server string 	`yaml:"smtp_server" env-default:"smtp.mail.ru"`
+	Port string		`yaml:"smtp_port" env-default:"587"`
 }
 
 

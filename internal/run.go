@@ -30,7 +30,7 @@ func Run() {
 func startServer(ctx context.Context, server *my_grpc.Server) {
 	listener, err := net.Listen("tcp", server.Cfg.GrpcAddress)
 	if err != nil {
-		server.Log.Error("Error trying to listen: %w", err)
+		server.Log.Error("Error trying to listen: %w", logger.Err(err))
 	}
 	opts := []grpc.ServerOption{}
 	grpcServer := grpc.NewServer(opts...)
@@ -38,7 +38,7 @@ func startServer(ctx context.Context, server *my_grpc.Server) {
 	
 	go func() {
 		if err := grpcServer.Serve(listener); err != nil {
-			server.Log.Error("Server error: %w", err)
+			server.Log.Error("Server error: %w", logger.Err(err))
 		}
 	}()
 

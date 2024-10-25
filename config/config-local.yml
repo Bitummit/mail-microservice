@@ -7,3 +7,7 @@ grpc_server:
 
 kafka_broker:
   kafka_address: "0.0.0.0:9092"
+
+email:
+  smtp_server: "smtp.mail.ru"
+  smtp_port: "587"
