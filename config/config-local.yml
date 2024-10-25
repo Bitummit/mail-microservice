@@ -1,0 +1,9 @@
+env: "local"
+
+grpc_server:
+  grpc_address: "0.0.0.0:5301"
+  timeout: 5s
+  idle_timeout: 60s
+
+kafka_broker:
+  kafka_address: "0.0.0.0:9092"
