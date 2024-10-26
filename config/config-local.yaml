@@ -6,6 +6,7 @@ grpc_server:
   idle_timeout: 60s
 
 kafka_broker:
+  kafka_leader: "0.0.0.0:9092"
   kafka_address: "0.0.0.0:9092"
 
 email:

@@ -22,7 +22,8 @@ type GrpcServer struct {
 }
 
 type Kafka struct {
-	KafkaAddress string `yaml:"kafka_address" env-default:"0.0.0.0:9092"`
+	KafkaLeader string		`yaml:"kafka_leader" env-default:"0.0.0.0:9092"`
+	KafkaAddress string 	`yaml:"kafka_address" env-default:"0.0.0.0:9092"`
 }
 
 type Email struct {

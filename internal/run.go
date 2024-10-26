@@ -2,12 +2,14 @@ package run
 
 import (
 	"context"
+	"fmt"
 	"net"
 	"os/signal"
 	"sync"
 	"syscall"
 
 	my_grpc "github.com/Bitummit/mail-microservice/internal/api/grpc"
+	my_kafka "github.com/Bitummit/mail-microservice/internal/api/kafka"
 	"github.com/Bitummit/mail-microservice/pkg/config"
 	"github.com/Bitummit/mail-microservice/pkg/logger"
 	"github.com/Bitummit/mail-microservice/pkg/proto"
@@ -27,7 +29,18 @@ func Run() {
 	server := my_grpc.New(cfg, log)
 	wg.Add(1)
 	go startServer(ctx, wg, server)
+
+	kafkaService, err := startKafka(ctx, cfg)
+	if err != nil {
+		log.Error("starting kafka service: %w", err)
+		return
+	}
+	log.Info("Kafka started")
 	<-ctx.Done()
+	kafkaService.Conn.Close()
+	kafkaService.ConsumerGroup.Close()
+	log.Info("kafka stopped")
+	wg.Wait()
 	log.Info("Service stopped")
 }
 
@@ -50,4 +63,13 @@ func startServer(ctx context.Context, wg *sync.WaitGroup, server *my_grpc.Server
 	defer wg.Done()
 	grpcServer.GracefulStop()
 	server.Log.Info("Server stopped")
+}
+
+func startKafka(ctx context.Context, cfg *config.Config) (*my_kafka.Kafka, error){
+	kafkaService, err := my_kafka.New(ctx, cfg.KafkaLeader, "emails", "send_mail", 1, []string{cfg.KafkaAddress})
+	if err != nil {
+		return nil , fmt.Errorf("starting kafka: %w", err)
+	}
+	kafkaService.RunConsumerWithGroup(ctx, "send_mail")
+	return kafkaService, nil
 }
