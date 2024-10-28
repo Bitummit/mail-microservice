@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"time"
 
+	"github.com/Bitummit/mail-microservice/pkg/proto"
 	"github.com/segmentio/kafka-go"
 	"golang.org/x/net/context"
 )
@@ -15,6 +16,12 @@ type Kafka struct {
 	Brokers []string
 	Topic string
 	ConsumerGroup *kafka.ConsumerGroup
+	Reader *kafka.Reader
+	Server HTTPServer
+}
+
+type HTTPServer interface {
+	Send(ctx context.Context, req *proto.EmailRequest) (*proto.EmailResponse, error)
 }
 
 func New(ctx context.Context, leaderAddress, topic, group_id string, partition int, brokers []string) (*Kafka, error){
@@ -48,17 +55,32 @@ func New(ctx context.Context, leaderAddress, topic, group_id string, partition i
 }
 
 func (k *Kafka) RunConsumerWithGroup(ctx context.Context, group_id string) {
+	// с группой не работает
+	// после перезапуска читает все евенты
 	r := kafka.NewReader(kafka.ReaderConfig{
 		Brokers:	k.Brokers,
-		GroupID:	group_id,
+		// GroupID:	group_id,
+		Partition: 0,
 		Topic:		k.Topic,
 	})
-	slog.Info("%v", r)
+	k.Reader = r
+
 	go func() {
 		for {
 		m, err := r.ReadMessage(ctx)
 		if err != nil {
+			r.Close()
 			break
+		}
+		
+		req := &proto.EmailRequest{
+			To: []string{string(m.Value)},
+			Subject: "You are registered",
+			Body: "Thanks for registration",
+		}
+		_, err = k.Server.Send(ctx, req)
+		if err != nil {
+			slog.Error("send email: %w", err)
 		}
 		fmt.Printf("message at topic/partition/offset %v/%v/%v: %s = %s\n", m.Topic, m.Partition, m.Offset, string(m.Key), string(m.Value))
 	}

@@ -30,7 +30,7 @@ func Run() {
 	wg.Add(1)
 	go startServer(ctx, wg, server)
 
-	kafkaService, err := startKafka(ctx, cfg)
+	kafkaService, err := startKafka(ctx, cfg, server)
 	if err != nil {
 		log.Error("starting kafka service", err)
 		return
@@ -38,6 +38,7 @@ func Run() {
 	log.Info("Kafka started")
 	
 	<-ctx.Done()
+	kafkaService.Reader.Close()
 	kafkaService.ConsumerGroup.Close()
 	kafkaService.Conn.Close()
 	log.Info("kafka stopped")
@@ -66,11 +67,12 @@ func startServer(ctx context.Context, wg *sync.WaitGroup, server *my_grpc.Server
 	server.Log.Info("Server stopped")
 }
 
-func startKafka(ctx context.Context, cfg *config.Config) (*my_kafka.Kafka, error){
+func startKafka(ctx context.Context, cfg *config.Config, server *my_grpc.Server) (*my_kafka.Kafka, error){
 	kafkaService, err := my_kafka.New(ctx, cfg.KafkaLeader, "emails", "user-auth-email", 0, []string{cfg.KafkaAddress})
 	if err != nil {
 		return nil , fmt.Errorf("starting kafka: %w", err)
 	}
+	kafkaService.Server = server
 	kafkaService.RunConsumerWithGroup(ctx, "user-auth-email")
 	return kafkaService, nil
 }
