@@ -61,6 +61,7 @@ func startServer(ctx context.Context, wg *sync.WaitGroup, server *my_grpc.Server
 		}
 	}()
 	server.Log.Info("Server started")
+	
 	<-ctx.Done()
 	defer wg.Done()
 	grpcServer.GracefulStop()

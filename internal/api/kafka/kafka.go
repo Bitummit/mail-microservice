@@ -12,7 +12,6 @@ import (
 
 type Kafka struct {
 	Conn *kafka.Conn
-	LeaderAddress string
 	Brokers []string
 	Topic string
 	ConsumerGroup *kafka.ConsumerGroup
@@ -41,12 +40,11 @@ func New(ctx context.Context, leaderAddress, topic, group_id string, partition i
 	}
 	consumerGroup, err := kafka.NewConsumerGroup(groupConfig)
 	if err != nil {
-		return nil, fmt.Errorf("faield to create consumer group")
+		return nil, fmt.Errorf("faield to create consumer group: %w", err)
 	}
 
 	return &Kafka{
 		Conn: conn,
-		LeaderAddress: leaderAddress,
 		Brokers: brokers,
 		Topic: topic,
 		ConsumerGroup: consumerGroup,
@@ -60,7 +58,7 @@ func (k *Kafka) RunConsumerWithGroup(ctx context.Context, group_id string) {
 	r := kafka.NewReader(kafka.ReaderConfig{
 		Brokers:	k.Brokers,
 		// GroupID:	group_id,
-		Partition: 0,
+		// Partition: 0,
 		Topic:		k.Topic,
 	})
 	k.Reader = r
