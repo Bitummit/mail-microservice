@@ -16,6 +16,7 @@ type MailSender struct {
 	Cfg *config.Config
 }
 
+
 func New(cfg *config.Config) *MailSender{
 	return &MailSender{
 		from: os.Getenv("EMAIL_ACCOUNT"),
@@ -23,7 +24,6 @@ func New(cfg *config.Config) *MailSender{
 		Cfg: cfg,
 	}
 }
-
 
 func (m *MailSender) SendMessage(email model.Email) error {
 	message := mail.NewMessage()

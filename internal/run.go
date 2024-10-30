@@ -32,7 +32,7 @@ func Run() {
 
 	kafkaService, err := startKafka(ctx, cfg, server)
 	if err != nil {
-		log.Error("starting kafka service", err)
+		log.Error("starting kafka service", logger.Err(err))
 		return
 	}
 	log.Info("Kafka started")

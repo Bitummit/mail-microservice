@@ -9,28 +9,28 @@ import (
 )
 
 
-type Config struct {
-	Env string	`yaml:"env" env-default:"dev"`
-	GrpcServer	`yaml:"grpc_server"`
-	Kafka 		`yaml:"kafka_broker"`
-	Email		`yaml:"email"`
+type (
+	Config struct {
+		Env string	`yaml:"env" env-default:"dev"`
+		GrpcServer	`yaml:"grpc_server"`
+		Kafka 		`yaml:"kafka_broker"`
+		Email		`yaml:"email"`
+	}
 
-}
+	GrpcServer struct {
+		GrpcAddress string `yaml:"grpc_address" env-default:"0.0.0.0:5400"`
+	}
 
-type GrpcServer struct {
-	GrpcAddress string `yaml:"grpc_address" env-default:"0.0.0.0:5400"`
-}
+	Kafka struct {
+		KafkaLeader string		`yaml:"kafka_leader" env-default:"0.0.0.0:9092"`
+		KafkaAddress string 	`yaml:"kafka_address" env-default:"0.0.0.0:9092"`
+	}
 
-type Kafka struct {
-	KafkaLeader string		`yaml:"kafka_leader" env-default:"0.0.0.0:9092"`
-	KafkaAddress string 	`yaml:"kafka_address" env-default:"0.0.0.0:9092"`
-}
-
-type Email struct {
-	Server string 	`yaml:"smtp_server" env-default:"smtp.mail.ru"`
-	Port int		`yaml:"smtp_port" env-default:"587"`
-}
-
+	Email struct {
+		Server string 	`yaml:"smtp_server" env-default:"smtp.mail.ru"`
+		Port int		`yaml:"smtp_port" env-default:"587"`
+	}
+)
 
 func InitConfig() *Config{
 	
