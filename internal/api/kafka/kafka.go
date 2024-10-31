@@ -24,9 +24,6 @@ type HTTPServer interface {
 }
 
 func New(ctx context.Context, leaderAddress, topic, group_id string, partition int, brokers []string) (*Kafka, error){
-	// Create consumergroup
-	// Создавать топик с партициями тут вручную или самой кафкой?
-	// На одном брокере несколько топиков норм?
 	conn, err := kafka.DialLeader(ctx, "tcp", leaderAddress, topic, partition)
 	if err != nil {
 		return nil, fmt.Errorf("failed to dial leader: %w", err)
@@ -53,22 +50,23 @@ func New(ctx context.Context, leaderAddress, topic, group_id string, partition i
 }
 
 func (k *Kafka) RunConsumerWithGroup(ctx context.Context, group_id string) {
-	// с группой не работает
 	// после перезапуска читает все евенты
+	// pass logger here
 	r := kafka.NewReader(kafka.ReaderConfig{
 		Brokers:	k.Brokers,
-		// GroupID:	group_id,
-		// Partition: 0,
+		GroupID:	group_id,
 		Topic:		k.Topic,
+		MinBytes: 1,
+		MaxBytes: 10e6,
 	})
 	k.Reader = r
-
+	
 	go func() {
 		for {
 		m, err := r.ReadMessage(ctx)
 		if err != nil {
-			r.Close()
-			break
+			time.Sleep(5 * time.Second)
+			continue
 		}
 		
 		req := &proto.EmailRequest{

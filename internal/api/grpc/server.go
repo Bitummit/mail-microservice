@@ -45,7 +45,6 @@ func (s *Server) Send(ctx context.Context, req *proto.EmailRequest) (*proto.Emai
 	}
 	
 	err := s.service.SendMessage(email)
-	s.Log.Info("Its OK")
 	if err != nil {
 		return nil, status.Error(codes.Internal, fmt.Sprint("can not send message %w", err))
 	}
